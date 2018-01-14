@@ -1,11 +1,26 @@
     var statistics = '';
     var allusers = '';
+    var time = " ";
+
 
     var header = document.createElement("header");
     document.body.appendChild(header);
 
-    function addInput() {
+    var todaysDate = new Date();
+    function convertDate(todaysDate) {
+        var yyyy = todaysDate.getFullYear().toString();
+        var mm = (todaysDate.getMonth() + 1).toString();
+        var dd = todaysDate.getDate().toString();
 
+        var mmChars = mm.split('');
+        var ddChars = dd.split('');
+
+        time = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+
+    }
+    convertDate(todaysDate);
+
+    function addInput() {
         var input = document.createElement("input");
         input.placeholder = "Введите id группы Vk";
         input.type = "search";
@@ -24,7 +39,7 @@
                     }
                 })
                 $.ajax({
-                    url: "https://api.vk.com/method/stats.get?group_id=" + searchtext + "&app_id=6311023&date_from=2017-12-01&date_to=2017-12-24&access_token=21538bf5a0e6910bd41233491729751cf579d30204d0045c2be220f215aca88854f59d72223d0cde7ec60&v=3.0",
+                    url: "https://api.vk.com/method/stats.get?group_id=" + searchtext + "&app_id=6311023&date_from=2018-01-01&date_to=" + time + "&access_token=21538bf5a0e6910bd41233491729751cf579d30204d0045c2be220f215aca88854f59d72223d0cde7ec60&v=3.0",
                     method: "GET",
                     dataType: "JSONP",
                     success: function(data) {
@@ -37,35 +52,34 @@
         header.appendChild(input);
     };
 
-     function getParams() {
+    function getParams() {
         var params = [];
 
-        if (statistics === undefined ) {
+        if (statistics === undefined) {
             alert("Статистика группы закрыта :(")
-        }
-        else {
+        } else {
 
-        for (var i = 0; i < statistics.length; i++) {
-            var data = statistics;
-            params.push({
-                views: data[i].views,
-                visitors: data[i].visitors,
-                reach_subscribers: data[i].reach_subscribers,
-                subscribed: data[i].subscribed,
-                reach: data[i].reach,
-                unsubscribed: data[i].unsubscribed
-            })
-        }
-        
-        check(params);
+            for (var i = 0; i < statistics.length; i++) {
+                var data = statistics;
+                params.push({
+                    views: data[i].views,
+                    visitors: data[i].visitors,
+                    reach_subscribers: data[i].reach_subscribers,
+                    subscribed: data[i].subscribed,
+                    reach: data[i].reach,
+                    unsubscribed: data[i].unsubscribed
+                })
+            }
+
+            check(params);
         }
     }
 
     function check(params) {
         var middle_visitors = 0;
         for (var i = 0; i < params.length; i++) {
-            middle_visitors += params[i].visitors ;
-            var sr_middle_visitors = middle_visitors/ params.length
+            middle_visitors += params[i].visitors;
+            var sr_middle_visitors = middle_visitors / params.length
         }
         var result = sr_middle_visitors / allusers * 100; //>1%
         console.log("кол-во уникальных пользователей от всех >1%", result);
@@ -74,10 +88,10 @@
         var users2 = 0;
 
         for (var i = 0; i < params.length; i++) {
-            users1 += params[i].subscribed ;
-            sr_users1 = users1/ params.length;
+            users1 += params[i].subscribed;
+            sr_users1 = users1 / params.length;
 
-            users2 += params[i].unsubscribed ;
+            users2 += params[i].unsubscribed;
             sr_users2 = users2 / params.length;
         }
         var result1 = sr_users1 / sr_users2 * 10; //<60%
@@ -85,20 +99,19 @@
 
         var ohvat = 0;
         for (var i = 0; i < params.length; i++) {
-            ohvat += params[i].reach ;
+            ohvat += params[i].reach;
             sr_ohvat = ohvat / params.length;
         }
         var result2 = sr_ohvat / allusers * 100; // >20%
         console.log("охват >20%", result2);
 
-        var target = (result-1) + (60-result1) + (result2-20)
+        var target = (result - 1) + (60 - result1) + (result2 - 20)
 
         if (result > 1 && result1 < 60 && result2 > 20) {
-            alert("Группа Эффективна на " + target )
+            alert("Группа Эффективна на " + target)
         } else {
             alert("Группа неэффективна!")
         }
     }
-
 
     addInput();
