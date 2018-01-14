@@ -37,8 +37,14 @@
         header.appendChild(input);
     };
 
-    function getParams() {
+     function getParams() {
         var params = [];
+
+        if (statistics === undefined ) {
+            alert("Статистика группы закрыта :(")
+        }
+        else {
+
         for (var i = 0; i < statistics.length; i++) {
             var data = statistics;
             params.push({
@@ -52,6 +58,7 @@
         }
         
         check(params);
+        }
     }
 
     function check(params) {
